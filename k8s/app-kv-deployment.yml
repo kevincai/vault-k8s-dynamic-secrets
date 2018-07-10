@@ -1,0 +1,45 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: vault-dynamic-secrets-rails
+  labels:
+    app: vault-dynamic-secrets-rails
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: vault-dynamic-secrets-rails
+    spec:
+      serviceAccountName: vault-auth
+      initContainers:
+        - name: vault-init
+          image: everpeace/curl-jq
+          imagePullPolicy: IfNotPresent
+          command:
+            - "sh"
+            - "-c"
+            - >
+              KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token);
+              curl --request POST --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "vault-k8s-sa"}' http://vault-master.caixh:8200/v1/auth/kubernetes/login | jq -j '.auth.client_token' > /etc/vault/token;
+              X_VAULT_TOKEN=$(cat /etc/vault/token);
+              curl --header "X-Vault-Token: $X_VAULT_TOKEN" http://vault-master.caixh:8200/v1/kodo_kv/data/pandora-secrets > /etc/app/creds.json;
+          volumeMounts:
+            - name: app-creds
+              mountPath: /etc/app
+            - name: vault-token
+              mountPath: /etc/vault
+      containers:
+        - name: rails
+          image: reg.qiniu.com/caixh/vault-rails-secrets:0.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: app-creds
+              mountPath: /etc/app
+      volumes:
+        - name: app-creds
+          emptyDir: {}
+        - name: vault-token
+          emptyDir: {}

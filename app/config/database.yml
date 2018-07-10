@@ -9,8 +9,8 @@ development:
   <<: *default
   database: rails_development
   host: intended-moth-postgresql
-  username: <%= CREDS['data']['username'] %>
-  password: <%= CREDS['data']['password'] %>
+  username: 'username'
+  password: 'password'
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.

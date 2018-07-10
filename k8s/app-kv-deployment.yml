@@ -31,7 +31,7 @@ spec:
               mountPath: /etc/vault
       containers:
         - name: rails
-          image: reg.qiniu.com/caixh/vault-rails-secrets:0.0.1
+          image: lvlouisaslia/vault-rails-secrets:0.0.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

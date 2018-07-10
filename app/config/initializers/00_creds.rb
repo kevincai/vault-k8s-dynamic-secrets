@@ -1,1 +1,1 @@
-CREDS = JSON.parse(File.read('/etc/app/creds.json'))
+CREDS = File.read('/etc/app/creds.json')

@@ -23,7 +23,7 @@ spec:
               KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token);
               curl --request POST --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "vault-k8s-sa"}' http://vault-master.caixh:8200/v1/auth/kubernetes/login | jq -j '.auth.client_token' > /etc/vault/token;
               X_VAULT_TOKEN=$(cat /etc/vault/token);
-              curl --header "X-Vault-Token: $X_VAULT_TOKEN" http://vault-master.caixh:8200/v1/kodo_kv/data/pandora-secrets > /etc/app/creds.json;
+              curl --header "X-Vault-Token: $X_VAULT_TOKEN" http://vault-master.caixh:8200/v1/kodo_kv/data/pandora_secrets > /etc/app/creds.json;
           volumeMounts:
             - name: app-creds
               mountPath: /etc/app
@@ -31,7 +31,7 @@ spec:
               mountPath: /etc/vault
       containers:
         - name: rails
-          image: lvlouisaslia/vault-rails-secrets:0.0.2
+          image: lvlouisaslia/vault-rails-secrets:0.0.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
